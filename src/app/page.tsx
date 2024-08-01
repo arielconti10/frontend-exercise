@@ -20,11 +20,11 @@ type Props = {
 };
 
 export default async function Home({ searchParams }: Props) {
-  const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
+  const page = parseInt(searchParams.page as string, 10) || 1;
   const search = searchParams.search || "";
 
   const { results, next, previous, count } = await index({
-    page: isNaN(page) ? 1 : page,
+    page,
     search: search,
   });
 
