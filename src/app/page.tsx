@@ -20,6 +20,7 @@ type Props = {
 };
 
 export default async function Home({ searchParams }: Props) {
+  // test
   const page = parseInt(searchParams.page as string, 10) || 1;
   const search = searchParams.search || "";
 
