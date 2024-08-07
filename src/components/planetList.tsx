@@ -29,8 +29,30 @@ export function PlanetList() {
     placeholderData: keepPreviousData,
   });
 
-  const { results, next, previous, count } = data || {};
-  const totalPages = Math.ceil((count || 0) / 10);
+  if (isError) {
+    return (
+      <div className="text-center py-4 text-red-500">
+        An error occurred: {(error as Error).message}
+      </div>
+    );
+  }
+
+  if (isLoading || !data) {
+    return (
+      <section className="mt-8 flex flex-col w-full" data-testid="planet-list">
+        <div className="mb-12 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {Array(10)
+            .fill(0)
+            .map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+        </div>
+      </section>
+    );
+  }
+
+  const { results, next, previous, count } = data;
+  const totalPages = Math.ceil(count / 10);
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams);
@@ -52,12 +74,7 @@ export function PlanetList() {
   }
 
   const renderPlanetCards = () => {
-    if (isLoading) {
-      return Array(10)
-        .fill(0)
-        .map((_, index) => <SkeletonCard key={index} />);
-    }
-    return results?.map((planet) => (
+    return results.map((planet) => (
       <Link
         className="w-full"
         key={planet.id}
@@ -68,14 +85,6 @@ export function PlanetList() {
       </Link>
     ));
   };
-
-  if (isError) {
-    return (
-      <div className="text-center py-4 text-red-500">
-        An error occurred: {(error as Error).message}
-      </div>
-    );
-  }
 
   return (
     <section className="mt-8 flex flex-col w-full" data-testid="planet-list">
