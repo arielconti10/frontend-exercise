@@ -14,24 +14,29 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-type PlanetListProps = {
-  initialPage: number;
-  initialSearch: string;
-};
+export function PlanetList() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-export function PlanetList({ initialPage, initialSearch }: PlanetListProps) {
-  const [page, setPage] = useState(initialPage);
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const search = searchParams.get("search") || "";
 
   const { data, isLoading, isError, error } = useQuery<Pagination<Planet>>({
-    queryKey: ["planets", page, initialSearch],
-    queryFn: () => index({ page, search: initialSearch }),
+    queryKey: ["planets", page, search],
+    queryFn: () => index({ page, search }),
     placeholderData: keepPreviousData,
   });
 
   const { results, next, previous, count } = data || {};
   const totalPages = Math.ceil((count || 0) / 10);
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage.toString());
+    router.push(`/?${params.toString()}`);
+  };
 
   function SkeletonCard() {
     return (
@@ -82,7 +87,7 @@ export function PlanetList({ initialPage, initialSearch }: PlanetListProps) {
         <PaginationContent className="flex-wrap justify-center">
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => setPage((old) => Math.max(old - 1, 1))}
+              onClick={() => handlePageChange(Math.max(page - 1, 1))}
               disabled={page === 1 || isLoading}
             >
               Previous
@@ -93,7 +98,7 @@ export function PlanetList({ initialPage, initialSearch }: PlanetListProps) {
             <PaginationItem key={i} className="hidden sm:inline-block">
               <PaginationLink
                 isActive={i === page}
-                onClick={() => setPage(i)}
+                onClick={() => handlePageChange(i)}
                 disabled={isLoading}
               >
                 {i}
@@ -105,7 +110,7 @@ export function PlanetList({ initialPage, initialSearch }: PlanetListProps) {
             <PaginationNext
               onClick={() => {
                 if (next) {
-                  setPage((old) => old + 1);
+                  handlePageChange(page + 1);
                 }
               }}
               disabled={!next || isLoading}

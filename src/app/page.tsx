@@ -6,7 +6,6 @@ import {
 import { PlanetList } from "@/components/planetList";
 import { index } from "@/server/planet";
 import { SearchBar } from "@/components/searchBar";
-
 export default async function Home({
   searchParams,
 }: {
@@ -30,7 +29,7 @@ export default async function Home({
             Explore the galaxy
           </h1>
           <SearchBar name={search} />
-          <PlanetList initialPage={page} initialSearch={search} />
+          <PlanetList />
         </div>
       </main>
     </HydrationBoundary>
