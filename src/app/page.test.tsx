@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import Home from "./page";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 jest.mock("next/link", () => ({
   __esModule: true,
@@ -7,7 +8,7 @@ jest.mock("next/link", () => ({
 }));
 
 jest.mock("../server/planet", () => ({
-  index: jest.fn(() => ({
+  index: jest.fn(({ page, search }) => ({
     results: [{ name: "Tatooine" }, { name: "Alderaan" }, { name: "Yavin IV" }],
     next: null,
     previous: null,
@@ -19,7 +20,25 @@ jest.mock("@/components/searchBar", () => ({
   SearchBar: () => <div data-testid="search-bar" />,
 }));
 
+jest.mock("@/components/planetList", () => ({
+  PlanetList: jest.fn(() => <div data-testid="planet-list" />),
+}));
+
+jest.mock("@tanstack/react-query", () => ({
+  ...jest.requireActual("@tanstack/react-query"),
+  dehydrate: jest.fn(() => ({})),
+  HydrationBoundary: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
+}));
+
 describe("Home", () => {
+  const queryClient = new QueryClient();
+
+  beforeEach(() => {
+    queryClient.clear();
+  });
+
   it("renders the main heading", async () => {
     render(await Home({ searchParams: {} }));
     expect(screen.getByText("Explore the galaxy")).toBeInTheDocument();
@@ -30,14 +49,22 @@ describe("Home", () => {
     expect(screen.getByTestId("search-bar")).toBeInTheDocument();
   });
 
-  it("renders the correct number of planet cards", async () => {
+  it("renders the PlanetList component", async () => {
     render(await Home({ searchParams: {} }));
-    const planetCards = screen.getAllByTestId("planet-card");
-    expect(planetCards).toHaveLength(3);
+    expect(screen.getByTestId("planet-list")).toBeInTheDocument();
   });
 
-  it("renders pagination when no search params are present", async () => {
-    render(await Home({ searchParams: {} }));
-    expect(screen.getByRole("navigation")).toBeInTheDocument();
+  it("prefetches the correct query", async () => {
+    const mockPrefetchQuery = jest.fn();
+    jest
+      .spyOn(QueryClient.prototype, "prefetchQuery")
+      .mockImplementation(mockPrefetchQuery);
+
+    await Home({ searchParams: { page: "2", search: "test" } });
+
+    expect(mockPrefetchQuery).toHaveBeenCalledWith({
+      queryKey: ["planets", 2, "test"],
+      queryFn: expect.any(Function),
+    });
   });
 });
