@@ -13,8 +13,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter, useSearchParams } from "next/navigation";
+import SkeletonCard from "@/components/ui/skeletonCard";
 
 export function PlanetList() {
   const router = useRouter();
@@ -37,7 +37,7 @@ export function PlanetList() {
     );
   }
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <section className="mt-8 flex flex-col w-full" data-testid="planet-list">
         <div className="mb-12 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -51,8 +51,8 @@ export function PlanetList() {
     );
   }
 
-  const { results, next, previous, count } = data;
-  const totalPages = Math.ceil(count / 10);
+  const { results, next, count } = data || {};
+  const totalPages = Math.ceil((count || 0) / 10);
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams);
@@ -60,21 +60,8 @@ export function PlanetList() {
     router.push(`/?${params.toString()}`);
   };
 
-  function SkeletonCard() {
-    return (
-      <div className="space-y-3">
-        <div className="aspect-square overflow-hidden">
-          <Skeleton className="h-full xl:h-80 w-full xl:min-w-80 min-w-32" />
-        </div>
-        <div className="space-y-1 p-2">
-          <Skeleton className="h-5 w-full" />
-        </div>
-      </div>
-    );
-  }
-
   const renderPlanetCards = () => {
-    return results.map((planet) => (
+    return results?.map((planet: Planet) => (
       <Link
         className="w-full"
         key={planet.id}
@@ -92,43 +79,44 @@ export function PlanetList() {
         {renderPlanetCards()}
       </div>
 
-      <PaginationUI className="overflow-x-auto">
-        <PaginationContent className="flex-wrap justify-center">
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() => handlePageChange(Math.max(page - 1, 1))}
-              disabled={page === 1 || isLoading}
-            >
-              Previous
-            </PaginationPrevious>
-          </PaginationItem>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((i) => (
-            <PaginationItem key={i} className="hidden sm:inline-block">
-              <PaginationLink
-                isActive={i === page}
-                onClick={() => handlePageChange(i)}
-                disabled={isLoading}
+      {totalPages > 1 && (
+        <PaginationUI className="overflow-x-auto">
+          <PaginationContent className="flex-wrap justify-center">
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => handlePageChange(Math.max(page - 1, 1))}
+                disabled={page === 1}
               >
-                {i}
-              </PaginationLink>
+                Previous
+              </PaginationPrevious>
             </PaginationItem>
-          ))}
 
-          <PaginationItem>
-            <PaginationNext
-              onClick={() => {
-                if (next) {
-                  handlePageChange(page + 1);
-                }
-              }}
-              disabled={!next || isLoading}
-            >
-              Next
-            </PaginationNext>
-          </PaginationItem>
-        </PaginationContent>
-      </PaginationUI>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((i) => (
+              <PaginationItem key={i} className="hidden sm:inline-block">
+                <PaginationLink
+                  isActive={i === page}
+                  onClick={() => handlePageChange(i)}
+                >
+                  {i}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => {
+                  if (next) {
+                    handlePageChange(page + 1);
+                  }
+                }}
+                disabled={!next}
+              >
+                Next
+              </PaginationNext>
+            </PaginationItem>
+          </PaginationContent>
+        </PaginationUI>
+      )}
     </section>
   );
 }
