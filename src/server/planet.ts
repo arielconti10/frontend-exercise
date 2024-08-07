@@ -1,5 +1,4 @@
-"use server";
-import { env } from "@/env.mjs";
+import api from "@/lib/api";
 import { Pagination } from "@/types/general";
 
 export type Planet = {
@@ -16,30 +15,17 @@ export type Planet = {
   surface_water: string;
 };
 
+type PlanetParams = {
+  page?: number;
+  search?: string;
+};
+
 export const index = async (
-  params: Partial<Pagination> & { search?: string }
+  params: PlanetParams
 ): Promise<Pagination<Planet>> => {
-  const query = new URLSearchParams(params as Record<string, string>);
-
-  const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/planets/?${query}`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch planets");
-  }
-
-  const data = await response.json();
-
-  return data;
+  return api<Pagination<Planet>>("planets", { query: params });
 };
 
 export const show = async (id: string): Promise<Planet> => {
-  const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/planets/${id}`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch planet");
-  }
-
-  const data = await response.json();
-
-  return data as Planet;
+  return api<Planet>(`planets/${id}`);
 };
