@@ -3,7 +3,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { PlanetList } from "./planetList";
+import { PlanetList } from "@/components/planetList";
 import { index } from "@/server/planet";
 import { SearchBar } from "@/components/searchBar";
 

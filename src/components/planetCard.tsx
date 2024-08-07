@@ -15,7 +15,7 @@ export function PlanetCard({
 }: PlanetCardProps) {
   return (
     <div
-      className={cn("space-y-3 w-full", className)}
+      className={cn("space-y-2 w-full", className)}
       {...props}
       data-testid="planet-card"
     >
@@ -24,7 +24,7 @@ export function PlanetCard({
           src={
             "https://static.wikia.nocookie.net/ptstarwars/images/f/f6/Tatoooinefull.jpg/revision/latest?cb=20071114001422"
           }
-          alt={"Tattoine"}
+          alt={planet.name}
           width={500}
           height={500}
           className={cn(
@@ -34,8 +34,10 @@ export function PlanetCard({
         />
       </div>
 
-      <div className="space-y-1">
-        <h3 className="text-xl font-medium leading-none">{planet.name}</h3>
+      <div className="space-y-1 p-2">
+        <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-medium leading-tight line-clamp-2">
+          {planet.name}
+        </h3>
       </div>
     </div>
   );
