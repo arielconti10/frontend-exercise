@@ -1,14 +1,14 @@
-import Planet from "@/app/planet/[id]/page";
 import { Modal } from "./modal";
+import PlanetDetail from "@/app/planet/[id]/planetDetail";
 
-export default function PhotoModal({
-  params: { id: planetId },
+export default function PlanetModalPage({
+  params: { id },
 }: {
   params: { id: string };
 }) {
   return (
     <Modal>
-      <Planet params={{ id: planetId }} />
+      <PlanetDetail id={id} />
     </Modal>
   );
 }

@@ -61,11 +61,11 @@ export function PlanetList() {
   };
 
   const renderPlanetCards = () => {
-    return results?.map((planet: Planet) => (
+    return results?.map((planet: Planet, index: number) => (
       <Link
         className="w-full"
-        key={planet.id}
-        href={`/planet/${planet.id}`}
+        key={index}
+        href={`/planet/${index + 1}`}
         passHref
       >
         <PlanetCard planet={planet} />
