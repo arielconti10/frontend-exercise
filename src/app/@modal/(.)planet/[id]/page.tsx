@@ -1,5 +1,5 @@
 import { Modal } from "./modal";
-import PlanetDetail from "@/app/planet/[id]/planetDetail";
+import PlanetDetail from "@/components/planetDetail";
 
 export default function PlanetModalPage({
   params: { id },

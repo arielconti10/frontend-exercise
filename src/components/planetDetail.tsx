@@ -59,7 +59,7 @@ function InfoItem({ label, value }: { label: string; value: string | number }) {
 
 function PlanetSkeleton() {
   return (
-    <main className="flex flex-col items-center p-24">
+    <main className="flex flex-col items-center p-24" data-testid="skeleton">
       <div className="w-full rounded-lg overflow-hidden">
         <div className="p-8">
           <Skeleton className="h-10 w-3/4 mb-4" />
